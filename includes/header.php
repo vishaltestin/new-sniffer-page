@@ -11,7 +11,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
    
     <header class="site-header">
         <a class="logo-link" href="index.php" aria-label="WWF India home">
-            <img src="https://donate.wwfindia.org/images/logo.webp" alt="WWF India logo" />
+            <img src="images/wwf_logo.webp" alt="WWF India logo" />
         </a>
         <button class="btn btn-dark header-donate" data-open-donate>
             Donate Now

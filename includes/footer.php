@@ -1,7 +1,7 @@
     <!-- ============ FOOTER ============ -->
     <footer class="site-footer">
-        <img src="https://donate.wwfindia.org/images/logo.webp" alt="WWF India logo" />
-        <div>
+        <img src="images/wwf_logo.webp" alt="WWF India logo" />
+        <div class="footer-content">
             <p class="footer-tagline">
                 Building a future in which humans live in harmony with nature.
             </p>

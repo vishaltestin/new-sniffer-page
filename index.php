@@ -1,29 +1,30 @@
 <?php
 ob_start();
-include("include/class.digitalfueled.php");
-$obj_df = new DigitalFueledClass();
-$chk_class = $obj_df->call_to_class();
 
-$tamt=$obj_df->DoubleDonationAmount();
-// print_r($tamt);
+/* ------------------------------------------------------------------
+   Campaign progress (stub)
+   Replace with the real DigitalFueled / backend integration when ready
+   (the original repo used include/class.digitalfueled.php).
+------------------------------------------------------------------ */
+$goal   = 2500000;   // ₹25,00,000 matching fund
+$amount = 1720000;   // ₹17,20,000 raised
 
-// $amount = (float)$tamt['total_amount'];
+$progress   = min(($amount / $goal) * 100, 100);
+$remaining  = max($goal - $amount, 0);
 
-// if ($amount < 120000) {
-//     $amount = 120000;
-// }
-
-// $amountInLakh = number_format($amount / 100000, 1) . ' lakh';
-$goal = 2500000; // 25 lakh
-
-$amount = (float)$tamt['total_amount'] + 120000;
-
-$progress = min(($amount / $goal) * 100, 100);
-
-$amountInLakh = number_format($amount / 100000, 1) . ' lakh';
-$remaining = max($goal - $amount, 0);
-$remainingInLakh = number_format($remaining / 100000, 1) . ' lakh';
-
+/* Indian digit grouping: 1720000 => 17,20,000 */
+function inr_format($n) {
+    $n = (string)(int)$n;
+    if (strlen($n) > 3) {
+        $last3 = substr($n, -3);
+        $rest  = substr($n, 0, -3);
+        $rest  = preg_replace('/\B(?=(\d{2})+(?!\d))/', ',', $rest);
+        return $rest . ',' . $last3;
+    }
+    return $n;
+}
+$raisedText   = '₹' . inr_format($amount);
+$remainingText = '₹' . inr_format($remaining);
 ?>
 
 <!doctype html>
@@ -32,7 +33,7 @@ $remainingInLakh = number_format($remaining / 100000, 1) . ' lakh';
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Double Your Donation for India's Tigers | WWF-India</title>
+    <title>Double Your Donation for India's Super Sniffers | WWF-India</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap"
@@ -41,91 +42,103 @@ $remainingInLakh = number_format($remaining / 100000, 1) . ' lakh';
     <!-- Slick Carousel CSS -->
     <link rel="stylesheet" href="css/slick.min.css" />
     <link rel="stylesheet" href="css/index.css" />
-        <script src="js/jquery.min.js"></script>
+    <link rel="stylesheet" href="css/sniffers.css" />
+    <script src="js/jquery.min.js"></script>
 
-     <?php include 'includes/head.php'; ?>
+    <?php include 'includes/head.php'; ?>
 </head>
 
-<body>
-    
-    
+<body id="top">
+
     <?php include 'includes/header.php'; ?>
 
-    <!-- ============ STICKY BANNER (White Progress Design) ============ -->
-    <div class="progress-strip sticky-banner" id="stickyBanner">
-        <div class="progress-strip__inner">
-            <div class="progress-strip__label">
-                Double Your Donation for India's Tigers
-            </div>
-            <div class="progress-strip__bar_wrapper">
-                <div class="progress-strip__bar">
-                    <div class="progress-labels">
-                        <div><strong>INR <?php echo $amountInLakh; ?></strong><span>Raised</span></div>
-<div><strong>INR <?php echo $remainingInLakh; ?></strong><span>To go</span></div>
-                    </div>
-                    <div class="progress-track">
-                        <div class="progress-fill" style="width: <?php echo $progress; ?>%;"></div>
-                    </div>
-                    
-                </div>
-                <button class="btn btn-dark" data-open-donate>Donate Now</button>
-            </div>
-        </div>
-    </div>
-
     <!-- ============ HERO ============ -->
-    <section class="hero" id="top">
-        <div class="hero__inner">
-            <div class="hero-inner-v1">
-                <div class="hero__copy">
-                    <h1>Double Your Donation <br />for India's Tigers</h1>
-                    <p>
-                        Every donation made during this campaign will be matched until the
-                        matching fund is exhausted, doubling your impact for tiger
-                        conservation.
-                        <span class="info-trigger" data-open-tooltip aria-label="How the match works">?</span>
-                    </p>
+    <section class="sniffer-hero">
+        <div class="sniffer-hero__inner">
+            <div class="sniffer-hero__copy">
+                <h1>Not all superheroes wear capes</h1>
+                <p class="sniffer-hero__sub">
+                    Some have four paws<br />
+                    and a nose for justice
+                </p>
+            </div>
+
+            <!-- Inline donation card -->
+            <div class="donate-card" id="heroDonateCard">
+                <h3>Choose an amount</h3>
+                <p class="donate-card__sub">
+                    Every rupee you give will be matched — doubling your impact for
+                    India's Super Sniffers.
+                </p>
+
+                <div class="amount-grid" id="heroAmountGrid">
+                    <input type="radio" class="amount-radio visually-hidden" id="heroAmount25000"
+                        name="heroamount" value="25000" checked>
+                    <label class="amount-btn" for="heroAmount25000">₹ 25,000</label>
+
+                    <input type="radio" class="amount-radio visually-hidden" id="heroAmount10000"
+                        name="heroamount" value="10000">
+                    <label class="amount-btn" for="heroAmount10000">₹ 10,000</label>
+
+                    <input type="radio" class="amount-radio visually-hidden" id="heroAmount5000"
+                        name="heroamount" value="5000">
+                    <label class="amount-btn" for="heroAmount5000">₹ 5,000</label>
+
+                    <input type="radio" class="amount-radio visually-hidden" id="heroAmount2500"
+                        name="heroamount" value="2500">
+                    <label class="amount-btn" for="heroAmount2500">₹ 2,500</label>
+
+                    <input type="radio" class="amount-radio visually-hidden" id="heroAmountOther"
+                        name="heroamount" value="other">
+                    <label class="amount-btn amount-other" for="heroAmountOther"
+                        style="text-align: center;">₹ Other</label>
                 </div>
-                <div class="progress-card">
-                    <div class="progress-track">
-                        <div class="progress-fill" style="width: <?php echo $progress; ?>%;"></div>
-                    </div>
-                    <div class="progress-labels">
-                        <div><strong>INR <?php echo $amountInLakh; ?></strong><span>Raised</span></div>
-<div><strong>INR <?php echo $remainingInLakh; ?></strong><span>To go</span></div>
-                    </div>
-                    <div class="progress-btn-wrapper">
-                        <button class="btn btn-dark" data-open-donate>Donate Now</button>
+
+                <div class="other-amount-wrap" id="heroOtherWrap">
+                    <div class="field">
+                        <label for="heroOtherAmount">Enter your amount (₹)</label>
+                        <input type="number" id="heroOtherAmount" min="1000" placeholder="e.g. 7500" />
                     </div>
                 </div>
+
+                <p class="donate-card__note" id="heroDynamicNote">
+                    Your <strong>₹25,000</strong> donation will unlock an additional
+                    <strong>₹25,000</strong> for India's Super Sniffers.
+                </p>
+
+                <button class="btn btn-dark btn-block" id="heroDonateBtn" data-open-donate>
+                    Donate Now
+                </button>
+
+                <p class="donate-card__fine">
+                    Only Indian nationals aged 18 years or above can donate on this
+                    platform.
+                </p>
             </div>
         </div>
     </section>
 
-    <!-- Mobile-Only Hero Text block -->
-    <div class="mobile-hero-text">
-        <p>
-            Every donation made during this campaign will be matched until the
-            matching fund is exhausted, doubling your impact for tiger
-            conservation.
-            <span class="info-trigger" data-open-tooltip aria-label="How the match works">?</span>
-        </p>
+    <!-- ============ MATCHING STRIP + PROGRESS ============ -->
+    <div class="match-strip">
+        <span class="match-strip__text">
+            Every donation made during this campaign will be matched until the matching fund is
+            exhausted, doubling your impact for India's Super Sniffers.
+        </span>
     </div>
 
-    <!-- ============ STATIC PROGRESS STRIP (Hidden on Desktop, Visible on Mobile) ============ -->
-    <section class="progress-strip mobile-only-strip">
+    <section class="progress-strip" id="campaignStrip">
         <div class="progress-strip__inner">
             <div class="progress-strip__label">
-                Double Your Donation for India's Tigers
+                Double Your Donation for Super Sniffers
             </div>
             <div class="progress-strip__bar_wrapper">
                 <div class="progress-strip__bar">
-                    <div class="progress-track">
-                        <div class="progress-fill" style="width: <?php echo $progress; ?>%;"></div>
-                    </div>
                     <div class="progress-labels">
-                      <div><strong>INR <?php echo $amountInLakh; ?></strong><span>Raised</span></div>
-<div><strong>INR <?php echo $remainingInLakh; ?></strong><span>To go</span></div>
+                        <div><strong><?php echo $raisedText; ?></strong><span>Raised</span></div>
+                        <div><strong><?php echo $remainingText; ?></strong><span>To go</span></div>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: <?php echo round($progress, 1); ?>%;"></div>
                     </div>
                 </div>
                 <button class="btn btn-dark" data-open-donate>Donate Now</button>
@@ -133,92 +146,128 @@ $remainingInLakh = number_format($remaining / 100000, 1) . ' lakh';
         </div>
     </section>
 
-    <!-- ============ WHY PROTECT / CAROUSEL ============ -->
-    <section class="why-section">
-        <div class="section-head">
-            <h2>Why Protect India's Tigers?</h2>
+    <!-- ============ STICKY BOTTOM STRIP (appears once the hero scrolls past) ============ -->
+    <div class="sticky-strip" id="stickyStrip" aria-hidden="true">
+        <div class="match-strip sticky-strip__match">
+            <span class="match-strip__text">
+                Every donation made during this campaign will be matched until the matching fund is
+                exhausted, doubling your impact for India's Super Sniffers.
+            </span>
+        </div>
+        <div class="progress-strip sticky-strip__progress">
+            <div class="progress-strip__inner">
+                <div class="progress-strip__label">
+                    Double Your Donation for Super Sniffers
+                </div>
+                <div class="progress-strip__bar_wrapper">
+                    <div class="progress-strip__bar">
+                        <div class="progress-labels">
+                            <div><strong><?php echo $raisedText; ?></strong><span>Raised</span></div>
+                            <div><strong><?php echo $remainingText; ?></strong><span>To go</span></div>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: <?php echo round($progress, 1); ?>%;"></div>
+                        </div>
+                    </div>
+                    <button class="btn btn-dark" data-open-donate>Donate Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ POWERED BY PAWS (DARK) ============ -->
+    <section class="paws-section">
+        <div class="paws-section__inner">
+            <h2>Powered by paws, driven by instinct</h2>
             <p>
-                When you protect a tiger, you're protecting far more than a single
-                species. When India's tigers thrive, our forests thrive. When forests
-                thrive, people thrive. Your donation helps protect all three.
+                If you're a dog lover, you already know that dogs are capable of
+                extraordinary things. But did you know that some of them are also working
+                on the frontlines of wildlife protection?
             </p>
+            <p>
+                Meet India's Super Sniffers. With their extraordinary sense of smell, these
+                specially trained dogs help detect hidden wildlife products and support
+                efforts to protect vulnerable species.
+            </p>
+            <p>
+                Working closely with their dedicated handlers, they bring together instinct,
+                intelligence and training to do something truly remarkable.
+            </p>
+            <div class="paws-section__btn">
+                <button class="btn btn-light" data-open-donate>Support a Canine Hero Today</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ WHAT MAKES A SUPER SNIFFER ============ -->
+    <section class="why-section makes-section">
+        <div class="section-head">
+            <h2>What Makes a Super Sniffer</h2>
         </div>
 
         <div class="carousel">
-            <div class="carousel__viewport" id="whyCarousel">
+            <div class="carousel__viewport" id="makesCarousel">
 
                 <div class="carousel__slide">
                     <div class="slide-media">
-                        <img class="media-photo"
-                            src="images/Tiger-in-the-wild.webp"
-                            alt="Tiger in the wild" width="480" height="260" />
+                        <img class="media-photo" src="images/smell-nose.jpg" loading="eager"
+                            alt="Close-up of a detection dog's nose" width="480" height="260" />
                     </div>
                     <div class="slide-body">
-                        <h3>70% of the world's wild tigers live in India.</h3>
-                        <p>India is home to nearly 70% of the world's wild tiger population, making it the most
-                            important country for the future of the species.</p>
+                        <h3>An extraordinary sense of smell</h3>
+                        <p>
+                            A dog's sense of smell is remarkably more sensitive than ours,
+                            with around 300 million scent receptors compared to just 6
+                            million in humans. Some estimates suggest their olfactory sense
+                            is up to 10,000 times more precise than ours — detecting scents
+                            that our human noses would never detect.
+                        </p>
                     </div>
                 </div>
 
                 <div class="carousel__slide">
                     <div class="slide-media">
-                        <img class="media-photo"
-                            src="images/National-Emblem.webp"
-                            loading="eager"
-                            alt="Tiger as India's national emblem" width="480" height="260" />
+                        <img class="media-photo" src="images/field-run.jpg" loading="eager"
+                            alt="Detection dog running in a forest clearing" width="480" height="260" />
                     </div>
                     <div class="slide-body">
-                        <h3>More than a symbol. Part of our identity.</h3>
-                        <p>The tiger is India's national animal and has inspired our culture, history and heritage for
-                            generations. Protecting it means preserving a part of who we are.</p>
+                        <h3>Born for the field</h3>
+                        <p>
+                            Agile, alert and always ready for a challenge, detection dogs are
+                            trained to work through different environments, from dense
+                            forests to busy transit hubs.
+                        </p>
                     </div>
                 </div>
 
                 <div class="carousel__slide">
                     <div class="slide-media">
-                        <img class="media-photo"
-                            src="images/Healthy-Forest.webp"
-                            loading="eager"
-                            alt="Healthy forest ecosystem" width="480" height="260" />
+                        <img class="media-photo" src="images/bond-handler.jpg" loading="eager"
+                            alt="Handler bonding with his detection dog" width="480" height="260" />
                     </div>
                     <div class="slide-body">
-                        <h3>A healthy tiger population means a healthy forest.</h3>
-                        <p>As a keystone species, tigers help maintain balanced ecosystems. Their presence indicates
-                            forests that support biodiversity, protect water sources and store carbon.</p>
-                    </div>
-                </div>
-
-                <div class="carousel__slide">
-                    <div class="slide-media">
-                        <img class="media-photo"
-                            src="images/Community-Protection.webp"
-                            loading="eager"
-                            alt="Community protecting tiger habitat" width="480" height="260"
-                            />
-                    </div>
-                    <div class="slide-body">
-                        <h3>Protecting tigers protects us all.</h3>
-                        <p>When you support tiger conservation, you're helping conserve forests that benefit wildlife,
-                            communities and future generations.</p>
-                        <a href="#donate" class="slide-link" data-open-donate>Your gift can help secure that future.</a>
+                        <h3>An unbreakable bond</h3>
+                        <p>
+                            Behind every Super Sniffer is a dedicated handler, whose trust
+                            and training help turn an extraordinary bond into a team that
+                            takes action.
+                        </p>
                     </div>
                 </div>
 
             </div>
 
             <div class="carousel__controls">
-                <button class="carousel__arrow" id="carouselPrev" aria-label="Previous slide">
+                <button class="carousel__arrow" id="makesPrev" aria-label="Previous slide">
                     <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 64 64">
-                        <path
-                            d="M60 30H8.83l8.58-8.59a2 2 0 0 0-2.82-2.82l-12 12a2.06 2.06 0 0 0-.59 1.8 2.16 2.16 0 0 0 .55 1l12 12a2 2 0 1 0 2.82-2.82L8.83 34H60a2 2 0 0 0 0-4z"
+                        <path d="M60 30H8.83l8.58-8.59a2 2 0 0 0-2.82-2.82l-12 12a2.06 2.06 0 0 0-.59 1.8 2.16 2.16 0 0 0 .55 1l12 12a2 2 0 1 0 2.82-2.82L8.83 34H60a2 2 0 0 0 0-4z"
                             fill="#000000"></path>
                     </svg>
                 </button>
-                <div class="carousel__dots" id="carouselDots"></div>
-                <button class="carousel__arrow" id="carouselNext" aria-label="Next slide">
+                <div class="carousel__dots" id="makesDots"></div>
+                <button class="carousel__arrow" id="makesNext" aria-label="Next slide">
                     <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-                        <path
-                            d="m506.134 241.843-.018-.019-104.504-104c-7.829-7.791-20.492-7.762-28.285.068-7.792 7.829-7.762 20.492.067 28.284L443.558 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h423.557l-70.162 69.824c-7.829 7.792-7.859 20.455-.067 28.284 7.793 7.831 20.457 7.858 28.285.068l104.504-104 .018-.019c7.833-7.818 7.808-20.522-.001-28.314z"
+                        <path d="m506.134 241.843-.018-.019-104.504-104c-7.829-7.791-20.492-7.762-28.285.068-7.792 7.829-7.762 20.492.067 28.284L443.558 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h423.557l-70.162 69.824c-7.829 7.792-7.859 20.455-.067 28.284 7.793 7.831 20.457 7.858 28.285.068l104.504-104 .018-.019c7.833-7.818 7.808-20.522-.001-28.314z"
                             fill="#000000"></path>
                     </svg>
                 </button>
@@ -226,252 +275,524 @@ $remainingInLakh = number_format($remaining / 100000, 1) . ' lakh';
         </div>
     </section>
 
-    <!-- ============ MAKE ROOM / ACCORDION ============ -->
-    <section class="room-section">
+    <!-- ============ SUPER SNIFFERS AND BEYOND ============ -->
+    <section class="beyond-section">
         <div class="section-head">
-            <h2>Let's Make Room For The Tiger</h2>
-            <p class="room-sec-p">
-                India has helped bring its tigers back. Now we must ensure they have a future.
+            <h2>Super Sniffers and Beyond</h2>
+            <p class="beyond-sub">A team effort towards a greater mission.</p>
+            <p class="beyond-intro">
+                These extraordinary dogs may be at the heart of the mission, but they don't
+                work alone. It takes dedicated people, the right resources and continuous
+                support to help them make a difference.
             </p>
         </div>
 
-        <div class="accordion" id="accordion">
+        <!-- Accordion -->
+        <div class="accordion" id="beyondAccordion">
             <div class="accordion-item">
-                <button class="accordion-trigger">Keep Tigers Connected <span class="plus"></span></button>
+                <button class="accordion-trigger">Put extraordinary noses to work <span class="plus"></span></button>
                 <div class="accordion-panel">
-                    <div class="accordion-panel__inner">
-                        <div class="slide-media">
-                            <img class="media-photo"
-                                src="images/Forest-Corridor.webp"
-                                alt="Forest corridor" width="360" height="220" loading="eager" />
-                        </div>
+                    <div class="accordion-panel__inner accordion-panel__inner--text">
                         <div class="panel-text">
-                            <p>Fragmented forests leave tiger populations isolated, making it harder for them to move,
-                                find mates and thrive.</p>
-                            <p><strong>Your support helps WWF-India protect and reconnect the corridors they need to
-                                    survive.</strong></p>
+                            <p>From airports and transit hubs to vulnerable wildlife corridors,
+                                Super Sniffers use their remarkable sense of smell to detect
+                                hidden wildlife crime that might otherwise go undetected.</p>
+                            <p><strong>Your support helps WWF-India train, deploy and care for
+                                    specialised canine-handler squads working to protect
+                                    wildlife.</strong></p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="accordion-item">
-                <button class="accordion-trigger">Help People and Tigers Co-exist <span class="plus"></span></button>
+                <button class="accordion-trigger">Strengthen the teams behind the sniffers <span class="plus"></span></button>
                 <div class="accordion-panel">
-                    <div class="accordion-panel__inner">
-                        <div class="slide-media">
-                            <img class="media-photo"
-                                src="images/Village-Co-existence.webp"
-                                alt="Village community" width="360" height="220" loading="eager"/>
-                        </div>
+                    <div class="accordion-panel__inner accordion-panel__inner--text">
                         <div class="panel-text">
-                            <p>As tigers return to shared landscapes, so do the challenges of living alongside them.</p>
-                            <p><strong>Your support helps WWF-India work with communities through 'Bagh Mitras' to
-                                    monitor tiger movement, prevent conflict and support families affected by livestock
-                                    loss — helping people and tigers co-exist.</strong></p>
+                            <p>Every Super Sniffer works alongside a dedicated handler,
+                                supported by people on the frontline. Their work depends on
+                                the training, equipment and coordination.</p>
+                            <p><strong>Your support helps WWF-India strengthen canine-handler
+                                    teams and equip frontline personnel with the skills and
+                                    resources they need.</strong></p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="accordion-item">
-                <button class="accordion-trigger">Stop Wildlife Crime Before It Happens <span
-                        class="plus"></span></button>
+                <button class="accordion-trigger">Extend protection across species and habitats <span class="plus"></span></button>
                 <div class="accordion-panel">
-                    <div class="accordion-panel__inner">
-                        <div class="slide-media">
-                            <img class="media-photo"
-                                src="images/Anti-poaching-patrol.webp"
-                                alt="Anti-poaching patrol" width="360" height="220" loading="eager" />
-                        </div>
+                    <div class="accordion-panel__inner accordion-panel__inner--text">
                         <div class="panel-text">
-                            <p>Every tiger deserves to roam free — not become a victim of wildlife crime. Despite legal
-                                protection, poaching and the illegal wildlife trade continue to threaten India's tigers.
-                            </p>
-                            <p><strong>Your donation helps WWF-India work with enforcement agencies and frontline staff
-                                    to combat wildlife crime and keep tigers safe.</strong></p>
+                            <p>The work of protecting wildlife goes beyond individual species
+                                and forest boundaries. Super Sniffer teams contribute to our
+                                wider efforts to safeguard vulnerable wildlife and nature
+                                across terrestrial and marine habitats.</p>
+                            <p><strong>Your donation supports efforts to protect vulnerable
+                                    species and the ecosystems they depend on.</strong></p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="accordion-item">
-                <button class="accordion-trigger">Follow The Tiger's Journey <span class="plus"></span></button>
+                <button class="accordion-trigger">Make every detection count <span class="plus"></span></button>
                 <div class="accordion-panel">
-                    <div class="accordion-panel__inner">
-                        <div class="slide-media">
-                            <img class="media-photo"
-                                src="images/Camera-Trap-Monitoring.webp"
-                                alt="Camera trap monitoring" width="360" height="220" loading="eager" />
-                        </div>
+                    <div class="accordion-panel__inner accordion-panel__inner--text">
                         <div class="panel-text">
-                            <p>Protecting tigers begins with understanding how they move and behave. Using camera traps
-                                and scientific monitoring, WWF-India studies tiger movement to guide conservation where
-                                it's needed most.</p>
-                            <p><strong>Your donation supports science that protects India's tigers.</strong></p>
+                            <p>Identifying potential threats is only the beginning.
+                                Scientific research, field assessments and information-sharing
+                                help teams understand emerging risks and guide effective
+                                conservation action.</p>
+                            <p><strong>Your donation supports the knowledge, research and
+                                    coordination that help strengthen wildlife
+                                    protection.</strong></p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Slides carousel -->
+        <div class="carousel beyond-carousel">
+            <div class="carousel__viewport" id="beyondCarousel">
+
+                <div class="carousel__slide">
+                    <div class="slide-media">
+                        <img class="media-photo" src="images/transit-dog.jpg" loading="eager"
+                            alt="Sniffer dog inspecting parcels at a transit hub" width="480" height="260" />
+                    </div>
+                    <div class="beyond-card">
+                        <p>
+                            From airports and transit hubs to vulnerable wildlife corridors,
+                            Super Sniffers use their remarkable sense of smell to detect
+                            hidden wildlife crime that might otherwise go undetected.
+                        </p>
+                        <p><strong>
+                            Your support helps WWF-India train, deploy and care for
+                            specialised canine-handler squads working to protect wildlife.
+                        </strong></p>
+                    </div>
+                </div>
+
+                <div class="carousel__slide">
+                    <div class="slide-media">
+                        <img class="media-photo" src="images/training-dog.jpg" loading="eager"
+                            alt="Handler training a detection dog" width="480" height="260" />
+                    </div>
+                    <div class="beyond-card">
+                        <p>
+                            Every Super Sniffer works alongside a dedicated handler,
+                            supported by people on the frontline. Their work depends on the
+                            training, equipment and coordination.
+                        </p>
+                        <p><strong>
+                            Your support helps WWF-India strengthen canine-handler teams and
+                            equip frontline personnel with the skills and resources they
+                            need.
+                        </strong></p>
+                    </div>
+                </div>
+
+                <div class="carousel__slide">
+                    <div class="slide-media">
+                        <img class="media-photo" src="images/forest-team.jpg" loading="eager"
+                            alt="Forest team on patrol with a detection dog" width="480" height="260" />
+                    </div>
+                    <div class="beyond-card">
+                        <p>
+                            The work of protecting wildlife goes beyond individual species
+                            and forest boundaries. Super Sniffer teams contribute to our
+                            wider efforts to safeguard vulnerable wildlife and nature across
+                            terrestrial and marine habitats.
+                        </p>
+                        <p><strong>
+                            Your donation supports efforts to protect vulnerable species and
+                            the ecosystems they depend on.
+                        </strong></p>
+                    </div>
+                </div>
+
+                <div class="carousel__slide">
+                    <div class="slide-media">
+                        <img class="media-photo" src="images/equipment-dog.jpg" loading="eager"
+                            alt="Handler and detection dog checking a crate" width="480" height="260" />
+                    </div>
+                    <div class="beyond-card">
+                        <p>
+                            Identifying potential threats is only the beginning. Scientific
+                            research, field assessments and information-sharing help teams
+                            understand emerging risks and guide effective conservation
+                            action.
+                        </p>
+                        <p><strong>
+                            Your donation supports the knowledge, research and coordination
+                            that help strengthen wildlife protection.
+                        </strong></p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="carousel__controls">
+                <button class="carousel__arrow" id="beyondPrev" aria-label="Previous slide">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 64 64">
+                        <path d="M60 30H8.83l8.58-8.59a2 2 0 0 0-2.82-2.82l-12 12a2.06 2.06 0 0 0-.59 1.8 2.16 2.16 0 0 0 .55 1l12 12a2 2 0 1 0 2.82-2.82L8.83 34H60a2 2 0 0 0 0-4z"
+                            fill="#000000"></path>
+                    </svg>
+                </button>
+                <div class="carousel__dots" id="beyondDots"></div>
+                <button class="carousel__arrow" id="beyondNext" aria-label="Next slide">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+                        <path d="m506.134 241.843-.018-.019-104.504-104c-7.829-7.791-20.492-7.762-28.285.068-7.792 7.829-7.762 20.492.067 28.284L443.558 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h423.557l-70.162 69.824c-7.829 7.792-7.859 20.455-.067 28.284 7.793 7.831 20.457 7.858 28.285.068l104.504-104 .018-.019c7.833-7.818 7.808-20.522-.001-28.314z"
+                            fill="#000000"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
     </section>
 
-    <!-- ============ IMPACT STATEMENT ============ -->
+    <!-- ============ MEET OUR SUPER SNIFFERS ============ -->
+    <section class="breeds-section">
+        <div class="section-head">
+            <h2>Meet Our Super Sniffers</h2>
+            <p>
+                Over the years, different breeds have brought their own strengths and
+                personalities to wildlife detection work. From the intelligence of German
+                shepherds and the keen noses of labradors to the agility and drive of
+                Belgian malinois, each has contributed something special to the Super
+                Sniffer story.
+            </p>
+        </div>
+
+        <div class="breed-slider-wrap">
+            <div class="breed-slider" id="breedSlider">
+
+                <!-- Belgian Malinois -->
+                <div class="breed-card">
+                    <div class="breed-card__top">
+                        <div class="breed-card__media">
+                            <img src="images/breed-malinois.jpg" alt="Belgian Malinois" width="280" height="210" />
+                        </div>
+                        <div class="breed-card__head">
+                            <h3>Belgian Malinois - High Octane Athletes</h3>
+                            <p><strong>The View:</strong> Imagine a dog with the energy of a
+                                sports car and the focus of a laser beam. Always alert, always
+                                ready for a challenge, the Belgian malinois is built for
+                                action!</p>
+                        </div>
+                    </div>
+                    <div class="breed-card__body">
+                        <p class="breed-card__label">Canine Superpowers:</p>
+                        <ul>
+                            <li><strong>Born to Move:</strong> Lean, athletic and incredibly
+                                agile, they can navigate challenging terrain with impressive
+                                speed and ease.</li>
+                            <li><strong>All About the Mission:</strong> Intelligent, energetic
+                                and eager to work, they thrive on training, challenges and
+                                putting their remarkable nose to good use.</li>
+                        </ul>
+                        <p class="breed-card__quirk"><strong>The Quirky Reality:</strong>
+                            Belgian Malinois form incredibly close bonds with their handlers.
+                            They're the kind of loyal companion who want to be wherever their
+                            favourite human is — through forest trails, muddy riverbeds and
+                            every adventure in between!</p>
+                    </div>
+                </div>
+
+                <!-- German Shepherd -->
+                <div class="breed-card">
+                    <div class="breed-card__top">
+                        <div class="breed-card__media">
+                            <img src="images/breed-shepherd.jpg" alt="German Shepherd" width="280" height="210" />
+                        </div>
+                        <div class="breed-card__head">
+                            <h3>German Shepherd - The Noble Guardian</h3>
+                            <p><strong>The View:</strong> Larger and heavier-footed than the
+                                malinois, German shepherds bring calm confidence, noble
+                                strength and powerful awareness to every patrol.</p>
+                        </div>
+                    </div>
+                    <div class="breed-card__body">
+                        <p class="breed-card__label">Canine Superpowers:</p>
+                        <ul>
+                            <li><strong>Methodical genius:</strong> Quick to learn and
+                                excellent at following complex commands, they bring focus and
+                                discipline to every operation.</li>
+                            <li><strong>Steady nerves:</strong> Their sturdy build and
+                                endurance make them calm and reliable even in high-pressure
+                                situations.</li>
+                        </ul>
+                        <p class="breed-card__quirk"><strong>The Quirky Reality:</strong>
+                            Don't let their serious, dignified exterior fool you! German
+                            shepherds can be affectionately soft with their favourite people,
+                            always ready for a little praise or a playful moment.</p>
+                    </div>
+                </div>
+
+                <!-- Labrador -->
+                <div class="breed-card">
+                    <div class="breed-card__top">
+                        <div class="breed-card__media">
+                            <img src="images/breed-labrador.jpg" alt="Labrador" width="280" height="210" />
+                        </div>
+                        <div class="breed-card__head">
+                            <h3>Labrador - The Friendly Detective</h3>
+                            <p><strong>The View:</strong> The cheerful, big-hearted optimist!
+                                With their wagging tails, curious noses and famously friendly
+                                expressions, labradors have a way of winning hearts wherever
+                                they go.</p>
+                        </div>
+                    </div>
+                    <div class="breed-card__body">
+                        <p class="breed-card__label">Canine Superpowers:</p>
+                        <ul>
+                            <li><strong>A Nose for Discovery:</strong> Their remarkable sense
+                                of smell and enthusiasm for scent-based games make them
+                                excellent detection partners.</li>
+                            <li><strong>Friendly Nature:</strong> Their approachable
+                                temperament can make them particularly suited to working in
+                                busy public spaces.</li>
+                        </ul>
+                        <p class="breed-card__quirk"><strong>The Quirky Reality:</strong>
+                            Labradors are famously enthusiastic about treats, toys and belly
+                            rubs. A little positive reinforcement goes a long way with these
+                            happy, hardworking detectives!</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="carousel__controls">
+                <button class="carousel__arrow" id="breedPrev" aria-label="Previous breed">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 64 64">
+                        <path d="M60 30H8.83l8.58-8.59a2 2 0 0 0-2.82-2.82l-12 12a2.06 2.06 0 0 0-.59 1.8 2.16 2.16 0 0 0 .55 1l12 12a2 2 0 1 0 2.82-2.82L8.83 34H60a2 2 0 0 0 0-4z"
+                            fill="#000000"></path>
+                    </svg>
+                </button>
+                <div class="carousel__dots" id="breedDots"></div>
+                <button class="carousel__arrow" id="breedNext" aria-label="Next breed">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+                        <path d="m506.134 241.843-.018-.019-104.504-104c-7.829-7.791-20.492-7.762-28.285.068-7.792 7.829-7.762 20.492.067 28.284L443.558 236H20c-11.046 0-20 8.954-20 20s8.954 20 20 20h423.557l-70.162 69.824c-7.829 7.792-7.859 20.455-.067 28.284 7.793 7.831 20.457 7.858 28.285.068l104.504-104 .018-.019c7.833-7.818 7.808-20.522-.001-28.314z"
+                            fill="#000000"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ OUR COLLECTIVE IMPACT ============ -->
+    <section class="collective-section">
+        <div class="section-head">
+            <h2>Our Collective Impact</h2>
+        </div>
+
+        <div class="collective-card">
+            <div class="collective-stats">
+                <div class="stat-pill stat-pill--cream">
+                    <strong>120+</strong>
+                    <span>Canine Squads Trained</span>
+                </div>
+                <div class="stat-pill stat-pill--cyan">
+                    <strong>22</strong>
+                    <span>State and UTs Covered</span>
+                </div>
+                <div class="stat-pill stat-pill--pink">
+                    <strong>500+</strong>
+                    <span>Wildlife Cases Handled</span>
+                </div>
+            </div>
+
+            <div class="collective-media" id="collectiveMedia">
+                <img id="collectiveImg" src="images/impact-squad.jpg" alt="Canine squad in the field" width="900" height="340" />
+                <div class="collective-caption" id="collectiveCaption">
+                    From just 2 dogs in 2008 to a nationwide network of 120+ active working
+                    units.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ KNOW YOUR DONATION (DARK) ============ -->
     <section class="impact-section">
         <div class="impact-section__inner">
             <h2>Know that your donation is making a difference</h2>
-            <p>Your support strengthens WWF-India's decades of on-the-ground conservation work to protect India's
-                wildlife and natural heritage.</p>
-            <p>We'll keep you connected through stories from the field, conservation updates and impact reports that
-                show how your support is helping secure a future for India's tigers.</p>
-            <p>With WWF-India, you're an important part of the solution. Secure a future for India's tigers with a
-                tax-deductible donation today.</p>
+            <p>
+                Your support strengthens WWF-India's efforts to protect India's wildlife,
+                including the work of our remarkable Super Sniffer teams at the foundation
+                of this campaign.
+            </p>
+            <p>
+                We'll keep you connected through stories from the field, updates on the
+                Super Sniffer programme and impact reports that show how your support is
+                helping protect India's wildlife.
+            </p>
+            <p>
+                With WWF-India, you're an important part of the solution. Help our Super
+                Sniffers continue their extraordinary work with a tax-deductible donation
+                today.
+            </p>
             <div class="impact-btn-wrapper">
-                <button class="btn btn-dark" data-open-donate>Donate Now</button>
+                <button class="btn btn-dark" data-open-donate>Donate Today</button>
             </div>
         </div>
     </section>
 
-    <!-- ============ TOGETHER FOR TIGERS (SLICK DRIVEN) ============ -->
-    <section class="together-section">
-        <!-- New Wrapper for Heading + Controls -->
-        <div class="together-header">
-            <h2>Together For Tigers</h2>
-            <button class="together-next" id="togetherNext" aria-label="Next story">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                    stroke-linejoin="round">
-                    <path d="M9 5l7 7-7 7" />
-                </svg>
-            </button>
-        </div>
+    <!-- ============ FAQ ============ -->
+    <section class="faq-section">
+        <div class="faq-wrap">
+            <h2>Frequently Asked Questions</h2>
 
-        <div class="together-wrap">
-            <!-- Left Side Grid Buttons -->
-            <div class="person-grid" id="personGrid">
-                <button class="person-thumb is-active" data-person="0">
-                    <div class="slide-media"><img class="media-photo"
-                            src="images/Harvinder-Singh-Kalsi-Partner-in-Conservation.webp"
-                            alt="Harvinder Singh Kalsi" width="100" height="84" loading="eager" /></div>
-                    <span class="person-label">Harvinder Singh Kalsi</span>
-                </button>
-                <button class="person-thumb" data-person="1">
-                    <div class="slide-media"><img class="media-photo"
-                            src="images/Velamati-Bagh-Mitra.webp" alt="Bagh Mitra"
-                            width="100" height="84" /></div>
-                    <span class="person-label">Velamati</span>
-                </button>
-                <button class="person-thumb" data-person="2">
-                    <div class="slide-media"><img class="media-photo"
-                            src="images/Ashish-Gaur-Forest-Ranger.webp"
-                            alt="Forest Guard" width="100" height="84" loading="eager" /></div>
-                    <span class="person-label">Ashish Gaur</span>
-                </button>
-                <button class="person-thumb" data-person="3">
-                    <div class="slide-media"><img class="media-photo"
-                            src="images/Rohit-Ravi-Field-Biologist.webp"
-                            alt="Field Biologist" width="100" height="84" loading="eager" /></div>
-                    <span class="person-label">Rohit Ravi</span>
-                </button>
-            </div>
-
-            <!-- Right Side Testimonial Slick Slider -->
-            <div style="position: relative; min-width: 0;">
-                <div id="testimonialSlider">
-
-                    <!-- Slide 0 -->
-                    <div class="testimonial-card">
-                        <div class="testimonial-copy">
-                            <p class="testimonial-name">Harvinder Singh Kalsi</p>
-                            <p class="testimonial-role">Partner in Conservation</p>
-                            <p class="testimonial-desc">Conservation is only possible because people choose to stand for
-                                nature. Every donation helps protect India's wildlife for generations to come.</p>
-                            <div class="slide-media mobile-slide-media">
-                                <img class="media-photo"
-                                    src="images/hsk1.webp"
-                                    alt="Sudhir Kothari" width="170" height="180" loading="eager" />
-                            </div>
-                            <p class="testimonial-quote">"Supporting WWF-India has been one of the most fulfilling
-                                decisions I have made. Knowing that my contribution helps protect India's iconic species
-                                and habitats gives me immense pride. I appreciate the commitment of the team in keeping
-                                us well informed and updated."</p>
-                            <p class="testimonial-attrib">— Harvinder Singh Kalsi</p>
-                        </div>
-                        <div class="slide-media">
-                            <img class="media-photo"
-                                src="images/hsk1.webp"
-                                alt="Sudhir Kothari" width="170" height="180" loading="eager" />
+            <div class="faq-list" id="faqList">
+                <div class="faq-item is-open">
+                    <button class="faq-trigger">
+                        Who trains the super sniffers and their handlers?
+                        <span class="faq-chevron" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 9l6 6 6-6" />
+                            </svg>
+                        </span>
+                    </button>
+                    <div class="faq-panel">
+                        <div class="faq-panel__inner">
+                            Our programme works closely with government agencies and
+                            recognised dog-training centres. Since forest departments
+                            generally do not have specialised facilities for wildlife
+                            detection dog training, WWF-India facilitates the training of
+                            forest personnel as dog handlers and provides dogs to the
+                            deploying agencies. The dogs and their handlers train together at
+                            recognised government facilities, including centres run by the
+                            Indo-Tibetan Border Police (ITBP), Border Security Force (BSF)
+                            and Madhya Pradesh Police.
                         </div>
                     </div>
+                </div>
 
-                    <!-- Slide 1 -->
-                    <div class="testimonial-card">
-                        <div class="testimonial-copy">
-                            <p class="testimonial-name">Velamati</p>
-                            <p class="testimonial-role">Bagh Mitra</p>
-                            <p class="testimonial-desc">Bagh Mitras are trained community volunteers who help monitor
-                                tiger movement, alert authorities and reduce conflict between people and wildlife.</p>
-                            <div class="slide-media mobile-slide-media">
-                                <img class="media-photo"
-                                    src="images/v1.webp"
-                                    alt="Bagh Mitra volunteer" width="170" height="180" loading="eager" />
-                            </div>
-                            <p class="testimonial-quote">"When people feel informed and supported, fear gives way to
-                                coexistence. Protecting tigers begins with working alongside the communities that share
-                                their home."</p>
-                            <p class="testimonial-attrib">— Velamati</p>
-                        </div>
-                        <div class="slide-media">
-                            <img class="media-photo"
-                                src="images/v1.webp"
-                                alt="Bagh Mitra volunteer" width="170" height="180" loading="eager" />
+                <div class="faq-item is-open">
+                    <button class="faq-trigger">
+                        Where do super sniffers come from?
+                        <span class="faq-chevron" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 9l6 6 6-6" />
+                            </svg>
+                        </span>
+                    </button>
+                    <div class="faq-panel">
+                        <div class="faq-panel__inner">
+                            Our dogs come from certified breeders recommended by the
+                            recognised training centres. Each dog is selected with its
+                            suitability for specialised detection work in mind.
                         </div>
                     </div>
+                </div>
 
-                    <!-- Slide 2 -->
-                    <div class="testimonial-card">
-                        <div class="testimonial-copy">
-                            <p class="testimonial-name">Ashish Gaur</p>
-                            <p class="testimonial-role">Forest Guard</p>
-                            <p class="testimonial-desc">Forest staff work tirelessly to patrol protected areas, monitor
-                                wildlife and respond to threats, often under difficult and demanding conditions.</p>
-                            <div class="slide-media mobile-slide-media">
-                                <img class="media-photo"
-                                    src="images/ag1.webp"
-                                    alt="Forest Guard" width="170" height="180" loading="eager" />
-                            </div>
-                            <p class="testimonial-quote">"Protecting tigers isn't just about safeguarding one species.
-                                It's about protecting the forests that sustain countless lives — including our own."</p>
-                            <p class="testimonial-attrib">— Ashish Gaur</p>
-                        </div>
-                        <div class="slide-media">
-                            <img class="media-photo"
-                                 src="images/ag1.webp"
-                                alt="Forest Guard" width="170" height="180" loading="eager" />
+                <div class="faq-item is-open">
+                    <button class="faq-trigger">
+                        Why are the dogs trained when they are so young?
+                        <span class="faq-chevron" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 9l6 6 6-6" />
+                            </svg>
+                        </span>
+                    </button>
+                    <div class="faq-panel">
+                        <div class="faq-panel__inner">
+                            Starting training at a young age helps dogs develop their
+                            scent-detection abilities, confidence and working skills over
+                            time. It also gives them an opportunity to build a strong bond
+                            with their handlers as they learn and grow together.
                         </div>
                     </div>
+                </div>
 
-                    <!-- Slide 3 -->
-                    <div class="testimonial-card">
-                        <div class="testimonial-copy">
-                            <p class="testimonial-name">Rohit Ravi</p>
-                            <p class="testimonial-role">Field Biologist</p>
-                            <p class="testimonial-desc">WWF-India's field biologists study tiger behaviour, monitor
-                                populations and generate the scientific evidence needed to protect critical habitats and
-                                corridors.</p>
-                            <div class="slide-media mobile-slide-media">
-                                <img class="media-photo"
-                                    src="images/rr1.webp"
-                                    alt="Field Biologist" width="170" height="180" loading="eager" />
-                            </div>
-                            <p class="testimonial-quote">"Every camera trap image tells us something new. The more we
-                                understand how tigers move and behave, the better we can protect the landscapes they
-                                depend on."</p>
-                            <p class="testimonial-attrib">— Rohit Ravi</p>
+                <div class="faq-item is-open">
+                    <button class="faq-trigger">
+                        Who looks after the dogs when they retire?
+                        <span class="faq-chevron" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 9l6 6 6-6" />
+                            </svg>
+                        </span>
+                    </button>
+                    <div class="faq-panel">
+                        <div class="faq-panel__inner">
+                            A Super Sniffer may retire from duty, but the bond with their
+                            handler lasts a lifetime. The deploying agency remains
+                            responsible for their care, but in many cases, these loyal
+                            companions spend their golden years with the very humans who
+                            stood by their side through every mission.
                         </div>
-                        <div class="slide-media">
-                            <img class="media-photo"
-                                src="images/rr1.webp"
-                                alt="Field Biologist" width="170" height="180" loading="eager" />
+                    </div>
+                </div>
+
+                <div class="faq-item is-open">
+                    <button class="faq-trigger">
+                        Are the dogs safe when working in forests?
+                        <span class="faq-chevron" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 9l6 6 6-6" />
+                            </svg>
+                        </span>
+                    </button>
+                    <div class="faq-panel">
+                        <div class="faq-panel__inner">
+                            Absolutely! Super Sniffers are trained to adapt to forest
+                            environments and know how to navigate these settings. Their
+                            handlers are also specially trained to guide them and look after
+                            their well-being in the field.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item is-open">
+                    <button class="faq-trigger">
+                        Why don't you work with stray dogs?
+                        <span class="faq-chevron" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 9l6 6 6-6" />
+                            </svg>
+                        </span>
+                    </button>
+                    <div class="faq-panel">
+                        <div class="faq-panel__inner">
+                            We recognise that dogs come in all shapes, sizes and abilities.
+                            However, specialised detection work requires certain physical and
+                            behavioural traits, along with a strong aptitude for scent-based
+                            training. Our programme follows the selection and training
+                            protocols recommended by recognised dog training centres to
+                            identify dogs best suited to this work. The focus is always on
+                            finding the right dog for the job.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item is-open">
+                    <button class="faq-trigger">
+                        Is this India's only wildlife sniffer dog training programme?
+                        <span class="faq-chevron" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 9l6 6 6-6" />
+                            </svg>
+                        </span>
+                    </button>
+                    <div class="faq-panel">
+                        <div class="faq-panel__inner">
+                            WWF-India, in partnership with TRAFFIC, pioneered India's
+                            wildlife sniffer dog training programmes in 2008, starting with
+                            just two canine squads. Since then, the programme has grown
+                            significantly, training over 120 canine squads and extending
+                            wildlife detection capabilities across multiple states and union
+                            territories. Today, it is recognised as India's largest wildlife
+                            sniffer dog training programme.
                         </div>
                     </div>
                 </div>
@@ -483,31 +804,17 @@ $remainingInLakh = number_format($remaining / 100000, 1) . ' lakh';
     <section class="closing-cta">
         <div class="closing-cta__inner">
             <p>
-                The future of India's tigers won't be decided someday. It's being
-                decided today. Be part of the generation that ensures they continue to
-                roam our forests for years to come.
+                Behind every extraordinary nose is a dedicated handler, years of training
+                and a team working to protect India's wildlife. Your support can help these
+                remarkable canine guardians continue doing what they do best.
             </p>
-            <button class="btn btn-dark" data-open-donate>Donate Now</button>
+            <button class="btn btn-dark" data-open-donate>Donate Today</button>
         </div>
     </section>
 
     <?php include 'includes/footer.php'; ?>
 
-    <!-- ============ MODALS ============ -->
-    <div class="modal-overlay tooltip-modal" id="tooltipModal">
-        <div class="modal-box">
-            <button class="modal-close" data-close-tooltip aria-label="Close">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                    <path d="M6 6l12 12M18 6L6 18" />
-                </svg>
-            </button>
-            <h4>How the matching fund works</h4>
-            <p>A dedicated <strong>WWF-India matching fund</strong> has been set aside for this campaign. Every eligible
-                donation will be matched, <strong>up to ₹25,00,000</strong>, until the available matching funds are
-                fully allocated.</p>
-        </div>
-    </div>
-
+    <!-- ============ DONATE MODAL ============ -->
     <div class="modal-overlay donate-modal" id="donateModal">
         <div class="modal-box">
 
@@ -529,8 +836,8 @@ $remainingInLakh = number_format($remaining / 100000, 1) . ' lakh';
                     <div class="donate-modal__head">
                         <span class="step-tag">Step 1 of 3</span>
                         <h3 class="donate-modal__title">Choose an amount</h3>
-                        <p class="donate-modal__sub">Every rupee you give will be matched — doubling your impact for
-                            India's tigers.</p>
+                        <p class="donate-modal__sub">Every rupee you give will be matched —
+                            doubling your impact for India's Super Sniffers.</p>
                     </div>
                     <div class="donate-modal__body">
                         <div class="amount-grid" id="amountGrid">
@@ -552,8 +859,8 @@ $remainingInLakh = number_format($remaining / 100000, 1) . ' lakh';
 
                             <input type="radio" class="amount-radio visually-hidden" id="amountOther" name="amount"
                                 value="other">
-                            <label class="amount-btn amount-other" for="amountOther" style="text-align: center;">₹
-                                Other</label>
+                            <label class="amount-btn amount-other" for="amountOther"
+                                style="text-align: center;">₹ Other</label>
                         </div>
                         <div class="other-amount-wrap" id="otherAmountWrap">
                             <div class="field">
@@ -564,8 +871,8 @@ $remainingInLakh = number_format($remaining / 100000, 1) . ' lakh';
                         </div>
                         <p class="dynamic-note" id="dynamicNote">Select an amount to see your matched impact.</p>
                         <button type="button" class="btn btn-dark btn-block" id="step1Next" disabled>Donate Now</button>
-                        <p class="fine-note">Only Indian nationals aged 18 years or above can donate on this platform.
-                        </p>
+                        <p class="fine-note">Only Indian nationals aged 18 years or above can donate on this
+                            platform.</p>
                     </div>
                 </div>
 
@@ -590,9 +897,6 @@ $remainingInLakh = number_format($remaining / 100000, 1) . ' lakh';
                                     maxlength="10" required />
                             </div>
                         </div>
-                        <!--<div class="field">-->
-                        <!--    <label for="dob">Date of Birth*</label><input type="date" id="dob" name="date_of_birth" />-->
-                        <!--</div>-->
                         <div class="field">
                             <label for="address">Address*</label><input type="text" id="address" name="address"
                                 required />
@@ -660,37 +964,17 @@ $remainingInLakh = number_format($remaining / 100000, 1) . ' lakh';
                         </div>
 
                         <div class="field">
-                            <!--<label for="identificationType">Identification Type*</label>-->
-                            <!--<select id="identificationType" name="identification_type" required>-->
-                            <!--    <option value="">Select ID Type</option>-->
-                            <!--    <option value="aadhaar">Aadhaar</option>-->
-                            <!--    <option value="pan">PAN</option>-->
-                            <!--    <option value="passport">Passport</option>-->
-                            <!--</select>-->
                             <input type="hidden" name="identification_type" value="pan">
                         </div>
 
-                        <!--<div class="field id-field" id="aadhaarInput" hidden>-->
-                        <!--    <label for="aadhaar">Aadhaar Number*</label>-->
-                        <!--    <input type="text" id="aadhaar" name="aadhaar" maxlength="12"-->
-                        <!--        placeholder="12-digit Aadhaar number" autocomplete="off" />-->
-                        <!--</div>-->
-
-                        <!-- UNHIDDEN PAN INPUT -->
                         <div class="field id-field" id="panInput">
                             <label for="pan">PAN Card Number*</label>
                             <input type="text" id="pan" name="pan" maxlength="10" placeholder="ABCDE1234F"
                                 autocomplete="off" />
                         </div>
 
-                        <!--<div class="field id-field" id="passportInput" hidden>-->
-                        <!--    <label for="passport">Passport Number*</label>-->
-                        <!--    <input type="text" id="passport" name="passport" maxlength="8" placeholder="A1234567"-->
-                        <!--        autocomplete="off" />-->
-                        <!--</div>-->
-
-                        <p class="helper-note">PAN is required to claim 80G tax exemption. Donations of ₹5,000 and above
-                            require PAN to proceed.</p>
+                        <p class="helper-note">PAN is required to claim 80G tax exemption. Donations of ₹5,000 and
+                            above require PAN to proceed.</p>
 
                         <div style="display: none;">
                             <div class="d-flex" style="gap: 10px;">
@@ -744,7 +1028,6 @@ $remainingInLakh = number_format($remaining / 100000, 1) . ' lakh';
                             <div class="summary-row"><span>Name</span><span id="reviewName"></span></div>
                             <div class="summary-row"><span>Email</span><span id="reviewEmail"></span></div>
                             <div class="summary-row"><span>Phone</span><span id="reviewPhone"></span></div>
-                            <!--<div class="summary-row"><span>Date of Birth</span><span id="reviewDob"></span></div>-->
                             <div class="summary-row"><span>Address</span><span id="reviewAddress"></span></div>
                             <div class="summary-row"><span>City</span><span id="reviewCity"></span></div>
                             <div class="summary-row"><span>State</span><span id="reviewState"></span></div>
@@ -759,10 +1042,10 @@ $remainingInLakh = number_format($remaining / 100000, 1) . ' lakh';
                                     id="reviewTotal"></span></div>
                         </div>
 
-                        <input type="hidden" name="purpose" value="Double Your Donation for India Tigers">
-                        <input type="hidden" id="campaign" name="campaign" value="WWF-DYD">
+                        <input type="hidden" name="purpose" value="Double Your Donation for Super Sniffers">
+                        <input type="hidden" id="campaign" name="campaign" value="WWF-SS">
                         <input type="hidden" id="sourcename" name="sourcename"
-                            value="<?php if (isset($_GET['source'])) { echo htmlspecialchars($_GET['source']); } else { echo 'WWF-DYD'; } ?>">
+                            value="<?php if (isset($_GET['source'])) { echo htmlspecialchars($_GET['source']); } else { echo 'WWF-SS'; } ?>">
 
                         <p class="submit-error" id="submitError" hidden></p>
 
@@ -790,8 +1073,8 @@ $remainingInLakh = number_format($remaining / 100000, 1) . ' lakh';
                         </svg>
                     </div>
                     <h4>Thank you for doubling your impact</h4>
-                    <p>Your gift, together with the WWF-India match, is helping protect India's tigers and the forests
-                        they call home.</p>
+                    <p>Your gift, together with the WWF-India match, is helping protect India's
+                        Super Sniffers and the wildlife they safeguard.</p>
                     <button type="button" class="btn btn-outline btn-block" id="closeSuccess">Done</button>
                 </div>
             </div>
@@ -799,7 +1082,7 @@ $remainingInLakh = number_format($remaining / 100000, 1) . ' lakh';
     </div>
 
     <script src="js/slick.min.js"></script>
-    <script src="js/index.js"></script>
+    <script src="js/sniffers.js"></script>
 </body>
 
 </html>
